@@ -48,7 +48,7 @@ Tips:
 
 ### Plugin Configuration and Test
 
-To test plugin, create file:
+To test fluent-plugin-zabbix-simple, create file:
 
     <source>
       type forward
@@ -79,8 +79,8 @@ after a few seconds, confirm that the 321 has been recorded in the Zabbix Server
 name | type | description
 -----|------|------
 type | string | type of plugin. fluent-plugin-zabbix-simple has "zabbix_simple".
-zabbix_server | string | IP address or hostname of Zabbix server.
-port | integer | port no which zabbix server uses(default is 10051).
+zabbix_server | string | IP address or hostname of Zabbix Server.
+port | integer | port no which zabbix Server uses(default is 10051).
 host | string | hostname of sender(default is `Socket.gethostname`).
 key_size | integer | size of map_key(default is 20)
 map_key[n] | string | a space separated _pattern_ and _replacement. You can use `map_key0` as 0th map_key.
@@ -133,3 +133,4 @@ Copyright (c) 2013 NAKANO Hideo
 
 ### License
 Apache License, Version 2.0
+
