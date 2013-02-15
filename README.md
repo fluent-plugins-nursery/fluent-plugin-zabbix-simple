@@ -1,29 +1,34 @@
-= fluent-plugin-zabbix-simple
+# fluent-plugin-zabbix-simple
 
-== Component
+## What is this
 
-=== ZabbixSimpleOutput
+**fluent-plugin-zabbix-simple** is a [fluentd](http://fluentd.org/ "fluentd") output plugin to send values to [Zabbix](http://www.zabbix.com/ "Zabbix") Server.
 
-fluent-plugin-zabbix-simple converts fluent JSON key into zabbix key, and sends zabbix key and its value to Zabbix Server.
+fluentd collect logs as JSON.
+fluent-plugin-zabbix-simple converts **fluentd's JSON key** to **Zabbix key**, and sends _Zabbix key_ and its value to Zabbix Server.
 
-* You can define multiple key map, no size limitation.
+* You can define multiple key which you want to send, no size limitation.
 
-* You can use regex and you can replace the fluent JSON key using regex.
+* You can use regex both **key-pattern** and **key-replacement**.
 
-== Install
+  * **key-pattern** (simply called **pattern**) is a key that is matched against _fluentd's JSON key_.
+
+  * **key-replacement** (simple called **replacement**) is a key that is send to Zabbix Server if _pattern_ matches _fluentd's JSON key_. Before sending to Zabbix Server, _fluentd's JSON key_ is converted to _Zabbix key_ according to the replacement.
+
+## How to Install
 
 execute command `gem install`:
 
     $ sudo gem install fluent-plugin-zabbix-simple
 
-td-agent has its own Ruby ecosystem.
-If you have installed td-agent, You would use `gem` command included with td-agent:
+[td-agent](http://docs.fluentd.org/articles/install-by-rpm#what-is-td-agent) has its own Ruby ecosystem.
+If you have installed td-agent, you would use `gem` command included with td-agent.
 
     $ sudo /usr/lib64/fluent/ruby/bin/gem isntall fluent-plugin-zabbix-simple
 
-== Configuration
+## Installation Check
 
-=== Zabbix Server Configuration
+### Zabbix Server Configuration
 
 In advance, You shoud define zabbix items like this:
 
@@ -41,9 +46,9 @@ Tips:
 
 * You must choose a appropriate `Type of information`.
 
-=== Plugin Configuration and Test
+### Plugin Configuration and Test
 
-To test plugin, create file:
+To test fluent-plugin-zabbix-simple, create file:
 
     <source>
       type forward
@@ -68,10 +73,23 @@ Open another termina, send a test message to fluentd server.
 
 after a few seconds, confirm that the 321 has been recorded in the Zabbix Server.
 
-== Too Many Keys
+
+## Configuration
+
+name | type | description
+-----|------|------
+type | string | type of plugin. fluent-plugin-zabbix-simple has "zabbix_simple".
+zabbix_server | string | IP address or hostname of Zabbix Server.
+port | integer | port no which zabbix Server uses(default is 10051).
+host | string | hostname of sender(default is `Socket.gethostname`).
+key_size | integer | size of map_key(default is 20)
+map_key[n] | string | a space separated _pattern_ and _replacement. You can use `map_key0` as 0th map_key.
+
+
+## Use Many Keys
 
 By default, key_map is scanned up to 20.
-you must specify `key_size` if you want to use key_map more than 20.
+You must specify `key_size` if you want to use key_map more than 20.
 
     <match httpd.access.status_count>
       type zabbix_simple
@@ -104,19 +122,15 @@ you must specify `key_size` if you want to use key_map more than 20.
       map_key25 pattern25 replace25
     </match>
 
-== Specification of `map_key`
+## Detail of matching
 
-* you can use `map_key0`.
+fluent-plugin-zabbix-simple lookups from `map_key0` up to map_key[key_size], use the first matched map_key, ignore the rest of map_keys.
 
-* lookup from `map_key0`, use first matched map_key, ignore the remaining map_keys.
+## Legal Notification
 
-* you must not padding 0 like `map_key01`.
+### Copyright
+Copyright (c) 2013 NAKANO Hideo
 
-== TODO
+### License
+Apache License, Version 2.0
 
-- patches welcome!
-
-== Copyright
-
-Copyright:: Copyright (c) 2013 NAKANO Hideo
-License::   Apache License, Version 2.0
