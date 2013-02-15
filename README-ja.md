@@ -1,16 +1,21 @@
-= fluent-plugin-zabbix-simple
+# fluent-plugin-zabbix-simple
 
-== Component
+## 概要
 
-=== ZabbixSimpleOutput
+**fluent-plugin-zabbix-simple** は、[fluentd](http://fluentd.org/ "fluentd") output plugin で、[Zabbix](http://www.zabbix.com/ "Zabbix") Server に値を送ることができます。
 
-fluent が生成する JSON キーを変換し、Zabbix server へ送信します。
+fluentd は、ログを JSON として収集します。
+fluent-plugin-zabbix-simple は、**fluentdのJSONキー** を **Zabbixキー** に変換し、_Zabbix キー_ とその値を Zabbix Server に送ります。
 
 * 変換するキーは複数個定義でき、個数に制限はありません。
 
-* 変換するキーには正規表現を使うことができ、正規表現を使った置換もできます。
+* **key-pattern** と **key-replacement** の両方に正規表現を使うことができます。
 
-== Install
+  * **key-pattern**(単に **pattern** と呼ぶ)は、_fluentdのJSONキー_ と照合されるキーです。
+
+  * **key-replacement**(単に **replacement** と呼ぶ)は、_pattern_ と _fluentdのJSONキー_ との照合に成功した場合、Zabbix Server に送信されるキーです。
+
+## インストール方法
 
 コマンド `gem install` を実行します。
 
@@ -21,11 +26,11 @@ td-agent をインストールしている場合、td-agent 付属の gem コマ
 
     $ sudo /usr/lib64/fluent/ruby/bin/gem isntall fluent-plugin-zabbix-simple
 
-== Configuration
+## 確認
 
-=== Zabbix Server 設定
+### Zabbix Server 設定
 
-あらかじめ Zabbix server で次のようなアイテムを定義しておきます:
+あらかじめ Zabbix Server で次のようなアイテムを定義しておきます:
 
     Key: httpd.status[2xx]
     Type: Zabbix trapper
@@ -41,9 +46,9 @@ td-agent をインストールしている場合、td-agent 付属の gem コマ
 
 * `Type of information` は適切な型を選択してください。
 
-=== Plugin 設定&テスト
+### Plugin 設定&テスト
 
-Plugin をテストするため次のようなファイルを作成します。
+fluent-plugin-zabbix-simple をテストするため次のようなファイルを作成します。
 
     <source>
       type forward
@@ -68,9 +73,21 @@ Plugin をテストするため次のようなファイルを作成します。
 
 30 秒程度待って、Zabbix Server に 321 が記録されていることを確認します。
 
-== Too Many Keys
+## 設定
 
-既定では、キーは 20 番まで検索します。
+name | type | description
+-----|------|------
+type | string | plugin の type を指定します。fluent-plugin-zabbix-simple は、"zabbix_simple" を指定します。
+zabbix_server | string | Zabbix Server の IP address か hostname を指定します。
+port | integer | Zabbix Server が使用するポート番号を指定します(既定値は 10051)。
+host | string | Zabbix Server にデータを送信しようとしているホスト名です(既定値は `Socket.gethostname`)。
+key_size | integer | map_key のサイズ(既定値は 20)。
+map_key[n] | string | スペースで分割された _pattern_ と _replacement。 0 番目の map_key として `map_key0` を使用することができます。
+
+
+## 多くのキーを使う
+
+既定では、20 番目のキーまで検索します。
 もし 20 個以上のキーを指定する場合、key_size を指定しなければなりません。
 
     <match httpd.access.status_count>
@@ -104,20 +121,14 @@ Plugin をテストするため次のようなファイルを作成します。
       map_key25 pattern25 replace25
     </match>
 
-== Specification of `map_key`
+## 照合の詳細
 
-* `map_key0` も使用できます。
+fluent-plugin-zabbix-simple は、`map_key0` から照合を開始し、最初に照合に成功したキーを使用し、残りは無視します。
 
-* 0 番目の map_key から順にマッチするかどうかを調べ、最初にマッチした map_key を使い、
-  残りの map_key にマッチするものがあったとしても使用されません。
+## Legal Notification
 
-* `map_key01` などのように 0 を数値の左に詰めてはいけません。
+### Copyright
+Copyright (c) 2013 NAKANO Hideo
 
-== TODO
-
-- patches welcome!
-
-== Copyright
-
-Copyright:: Copyright (c) 2013- NAKANO Hideo
-License::   Apache License, Version 2.0
+### License
+Apache License, Version 2.0
