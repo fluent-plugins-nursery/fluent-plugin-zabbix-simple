@@ -1,4 +1,4 @@
-# fluent-plugin-zabbix-simple
+# fluent-plugin-zabbix-simple, a plugin for [Fluentd](http://fluentd.org)
 
 ## What is this
 
