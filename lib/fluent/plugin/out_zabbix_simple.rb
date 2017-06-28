@@ -27,10 +27,6 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
 
   DEFAULT_BUFFER_TYPE = "memory"
 
-  def initialize
-    super
-  end
-
   attr_reader :zabbix_server, :port, :host, :key_size, :map_keys
 
   config_param :zabbix_server, :string
