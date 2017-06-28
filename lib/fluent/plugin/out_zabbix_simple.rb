@@ -78,18 +78,18 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
 
   def send(zbx_sender, name, value, time)
     begin
-      $log.debug { "name: #{name}, value: #{value}, time: #{time}" }
+      log.debug { "name: #{name}, value: #{value}, time: #{time}" }
 
       opts = { :host => @host, :ts => time }
       status = zbx_sender.send_data(name, value.to_s, opts)
 
     rescue IOError, EOFError, SystemCallError
       # server didn't respond
-      $log.warn "Zabbix::Sender.send_data raises exception: #{$!.class}, '#{$!.message}'"
+      log.warn "Zabbix::Sender.send_data raises exception: #{$!.class}, '#{$!.message}'"
       status = false
     end
     unless status
-      $log.warn "failed to send to zabbix_server `#{@zabbix_server}(port:`#{@port}`), host:#{@host} '#{name}': #{value}"
+      log.warn "failed to send to zabbix_server `#{@zabbix_server}(port:`#{@port}`), host:#{@host} '#{name}': #{value}"
     end
   end
 
@@ -104,12 +104,12 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
   def write(chunk)
     zbx_sender = nil
     begin
-      $log.trace { "connecting to zabbix server `#{@zabbix_server}(port:`#{@port}`)" }
+      log.trace { "connecting to zabbix server `#{@zabbix_server}(port:`#{@port}`)" }
       zbx_sender = create_zbx_sender
       zbx_sender.connect
-      $log.trace "done connected to zabbix server"
+      log.trace "done connected to zabbix server"
     rescue
-      $log.warn "could not connect to zabbix server `#{@zabbix_server}(port:`#{@port})`, exception: #{$!.class}, '#{$!.message}'"
+      log.warn "could not connect to zabbix server `#{@zabbix_server}(port:`#{@port})`, exception: #{$!.class}, '#{$!.message}'"
     end
 
     if zbx_sender
