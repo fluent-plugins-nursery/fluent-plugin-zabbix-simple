@@ -15,8 +15,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-class Fluent::ZabbixSimpleOutput < Fluent::Output
+
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('zabbix_simple', self)
+
+  helpers :compat_parameters
+
+  DEFAULT_BUFFER_TYPE = "memory"
 
   def initialize
     super
@@ -31,9 +38,14 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
   config_param :host, :string,             :default => Socket.gethostname
   config_param :key_size, :integer,        :default => 20
 
+  config_section :buffer do
+    config_set_default :@type, DEFAULT_BUFFER_TYPE
+  end
+
   KeyMap = Struct.new(:id, :pattern, :replace)
 
   def configure(conf)
+    compat_parameters_convert(conf, :buffer)
     super
 
     if @zabbix_server.nil?
@@ -81,7 +93,15 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
     end
   end
 
-  def emit(tag, es, chain)
+  def format(tag, time, record)
+    [time, record].to_msgpack
+  end
+
+  def formatted_to_msgpack_binary?
+    true
+  end
+
+  def write(chunk)
     zbx_sender = nil
     begin
       $log.trace { "connecting to zabbix server `#{@zabbix_server}(port:`#{@port}`)" }
@@ -93,7 +113,7 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
     end
 
     if zbx_sender
-      es.each do |time, record|
+      chunk.msgpack_each do |time, record|
         record.each do |key,value|
           @map_keys.each do |map|
             zbx_key = map_key(key, map.pattern, map.replace)
@@ -104,9 +124,6 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
       end
       zbx_sender.disconnect
     end
-
-    # call next chain
-    chain.next
   end
 
   def map_key(key, pattern, replace)
