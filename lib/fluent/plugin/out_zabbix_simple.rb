@@ -16,6 +16,8 @@
 #    limitations under the License.
 #
 
+require 'zabbix'
+require 'socket'
 require 'fluent/plugin/output'
 
 class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
@@ -27,8 +29,6 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
 
   def initialize
     super
-    require 'zabbix'
-    require 'socket'
   end
 
   attr_reader :zabbix_server, :port, :host, :key_size, :map_keys
