@@ -72,7 +72,7 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
     Zabbix::Sender.new(:host => @zabbix_server, :port => @port)
   end
 
-  def send(zbx_sender, name, value, time)
+  def send_zabbix(zbx_sender, name, value, time)
     begin
       log.debug { "name: #{name}, value: #{value}, time: #{time}" }
 
@@ -114,7 +114,7 @@ class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
           @map_keys.each do |map|
             zbx_key = map_key(key, map.pattern, map.replace)
             next unless zbx_key
-            send(zbx_sender, zbx_key, value, time)
+            send_zabbix(zbx_sender, zbx_key, value, time)
           end
         end
       end
