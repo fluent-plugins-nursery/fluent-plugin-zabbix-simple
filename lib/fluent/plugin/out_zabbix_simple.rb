@@ -15,14 +15,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-class Fluent::ZabbixSimpleOutput < Fluent::Output
+
+require 'zabbix'
+require 'socket'
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::ZabbixSimpleOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('zabbix_simple', self)
 
-  def initialize
-    super
-    require 'zabbix'
-    require 'socket'
-  end
+  helpers :compat_parameters
+
+  DEFAULT_BUFFER_TYPE = "memory"
 
   attr_reader :zabbix_server, :port, :host, :key_size, :map_keys
 
@@ -31,9 +34,14 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
   config_param :host, :string,             :default => Socket.gethostname
   config_param :key_size, :integer,        :default => 20
 
+  config_section :buffer do
+    config_set_default :@type, DEFAULT_BUFFER_TYPE
+  end
+
   KeyMap = Struct.new(:id, :pattern, :replace)
 
   def configure(conf)
+    compat_parameters_convert(conf, :buffer)
     super
 
     if @zabbix_server.nil?
@@ -64,49 +72,54 @@ class Fluent::ZabbixSimpleOutput < Fluent::Output
     Zabbix::Sender.new(:host => @zabbix_server, :port => @port)
   end
 
-  def send(zbx_sender, name, value, time)
+  def send_zabbix(zbx_sender, name, value, time)
     begin
-      $log.debug { "name: #{name}, value: #{value}, time: #{time}" }
+      log.debug { "name: #{name}, value: #{value}, time: #{time}" }
 
       opts = { :host => @host, :ts => time }
       status = zbx_sender.send_data(name, value.to_s, opts)
 
     rescue IOError, EOFError, SystemCallError
       # server didn't respond
-      $log.warn "Zabbix::Sender.send_data raises exception: #{$!.class}, '#{$!.message}'"
+      log.warn "Zabbix::Sender.send_data raises exception: #{$!.class}, '#{$!.message}'"
       status = false
     end
     unless status
-      $log.warn "failed to send to zabbix_server `#{@zabbix_server}(port:`#{@port}`), host:#{@host} '#{name}': #{value}"
+      log.warn "failed to send to zabbix_server `#{@zabbix_server}(port:`#{@port}`), host:#{@host} '#{name}': #{value}"
     end
   end
 
-  def emit(tag, es, chain)
+  def format(tag, time, record)
+    [time, record].to_msgpack
+  end
+
+  def formatted_to_msgpack_binary?
+    true
+  end
+
+  def write(chunk)
     zbx_sender = nil
     begin
-      $log.trace { "connecting to zabbix server `#{@zabbix_server}(port:`#{@port}`)" }
+      log.trace { "connecting to zabbix server `#{@zabbix_server}(port:`#{@port}`)" }
       zbx_sender = create_zbx_sender
       zbx_sender.connect
-      $log.trace "done connected to zabbix server"
+      log.trace "done connected to zabbix server"
     rescue
-      $log.warn "could not connect to zabbix server `#{@zabbix_server}(port:`#{@port})`, exception: #{$!.class}, '#{$!.message}'"
+      log.warn "could not connect to zabbix server `#{@zabbix_server}(port:`#{@port})`, exception: #{$!.class}, '#{$!.message}'"
     end
 
     if zbx_sender
-      es.each do |time, record|
+      chunk.msgpack_each do |time, record|
         record.each do |key,value|
           @map_keys.each do |map|
             zbx_key = map_key(key, map.pattern, map.replace)
             next unless zbx_key
-            send(zbx_sender, zbx_key, value, time)
+            send_zabbix(zbx_sender, zbx_key, value, time)
           end
         end
       end
       zbx_sender.disconnect
     end
-
-    # call next chain
-    chain.next
   end
 
   def map_key(key, pattern, replace)

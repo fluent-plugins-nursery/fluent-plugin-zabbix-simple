@@ -1,10 +1,11 @@
 require 'helper'
+require 'fluent/test/driver/output'
 
 module Mock
-  class ::Fluent::ZabbixSimpleOutput
+  class ::Fluent::Plugin::ZabbixSimpleOutput
     def self.mock!
       include MockZabbixSimpleOutput
-      alias_method :old_create_zbx_sender, :create_zbx_sender 
+      alias_method :old_create_zbx_sender, :create_zbx_sender
       alias_method :create_zbx_sender, :mock_create_zbx_sender
     end
     def self.unmock!
@@ -52,16 +53,18 @@ class ZabbixOutputSimpleTest < Test::Unit::TestCase
     map_key2        x2 y2
   ]
 
-  def create_driver(conf = CONFIG, tag='test')
-    Fluent::Test::OutputTestDriver.new(Fluent::ZabbixSimpleOutput, tag).configure(conf)
+  def create_driver(conf = CONFIG)
+    Fluent::Test::Driver::Output.new(Fluent::Plugin::ZabbixSimpleOutput).configure(conf)
   end
 
   def test_emit001
     ::Mock::MockZbxSender.clearData
-    Fluent::ZabbixSimpleOutput.mock!
+    Fluent::Plugin::ZabbixSimpleOutput.mock!
     d = create_driver
-    d.emit({"x1" => "test value of x1"})
-    Fluent::ZabbixSimpleOutput.unmock!
+    d.run(default_tag: 'test') do
+      d.feed({"x1" => "test value of x1"})
+    end
+    Fluent::Plugin::ZabbixSimpleOutput.unmock!
 
     assert_equal(1, ::Mock::MockZbxSender.data.size)
     assert_equal("y1", ::Mock::MockZbxSender.data[0][0])
@@ -76,10 +79,12 @@ class ZabbixOutputSimpleTest < Test::Unit::TestCase
   def test_emit002
     ::Mock::MockZbxSender.clearData
 
-    Fluent::ZabbixSimpleOutput.mock!
+    Fluent::Plugin::ZabbixSimpleOutput.mock!
     d = create_driver
-    d.emit({"x3" => "test value of x3"})
-    Fluent::ZabbixSimpleOutput.unmock!
+    d.run(default_tag: 'test') do
+      d.feed({"x3" => "test value of x3"})
+    end
+    Fluent::Plugin::ZabbixSimpleOutput.unmock!
 
     assert_equal(0, ::Mock::MockZbxSender.data.size)
 
@@ -89,14 +94,16 @@ class ZabbixOutputSimpleTest < Test::Unit::TestCase
   def test_emit003
     ::Mock::MockZbxSender.clearData
 
-    Fluent::ZabbixSimpleOutput.mock!
+    Fluent::Plugin::ZabbixSimpleOutput.mock!
     d = create_driver %{
       zabbix_server  127.0.0.1
       map_key1       input_([^_]+)_count httpd.count[\\1]
     }
-    d.emit({"input_unmatched_count" => 10, "input_unmatched_rate" => 0.431, "input_unmatched_percentage" => 0.73})
-    d.emit({"input_status2xx_count" => 1884540035, "input_status2xx_rate" => 2041995578.0 / 730602602.0, "input_status2xx_percentage" => 422483907.0 / 426370718.0})
-    Fluent::ZabbixSimpleOutput.unmock!
+    d.run(default_tag: 'test') do
+      d.feed({"input_unmatched_count" => 10, "input_unmatched_rate" => 0.431, "input_unmatched_percentage" => 0.73})
+      d.feed({"input_status2xx_count" => 1884540035, "input_status2xx_rate" => 2041995578.0 / 730602602.0, "input_status2xx_percentage" => 422483907.0 / 426370718.0})
+    end
+    Fluent::Plugin::ZabbixSimpleOutput.unmock!
 
     assert_equal(2, ::Mock::MockZbxSender.data.size)
     assert_equal("httpd.count[unmatched]", ::Mock::MockZbxSender.data[0][0])
@@ -171,14 +178,14 @@ class ZabbixOutputSimpleTest < Test::Unit::TestCase
   def test_map_key
     d = create_driver
 
-    assert_equal("http.statusCount[2xx]", 
+    assert_equal("http.statusCount[2xx]",
       d.instance.map_key("input_status2xx_count", /^.+_status(...)_count$/,
         'http.statusCount[\1]'))
-    assert_equal("http.statusCount[2xx]", 
+    assert_equal("http.statusCount[2xx]",
       d.instance.map_key("input_status2xx_count",
          Regexp.new('^.+_status(...)_count$'),
         'http.statusCount[\1]'))
-    assert_nil( 
+    assert_nil(
       d.instance.map_key("input_status2xx_rate",
          Regexp.new('^.+_status(...)_count$'),
         'http.statusCount[\1]'))
