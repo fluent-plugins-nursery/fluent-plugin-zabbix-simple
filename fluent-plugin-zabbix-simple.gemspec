@@ -2,8 +2,8 @@
 # -*- mode:ruby -*-
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["NAKANO Hideo"]
-  gem.email         = ["nakano@ilu.co.jp"]
+  gem.authors       = ["NAKANO Hideo", "Hiroshi Hatake", "Kenji Okimoto"]
+  gem.email         = ["nakano@ilu.co.jp", "cosmo0920.oucc@gmail.com", "okkez000@gmail.com"]
   gem.description   = %q{Output data plugin to Zabbix}
   gem.summary       = %q{Output data plugin to Zabbix (like zabbix_sender)}
   gem.homepage      = "https://github.com/sunny4381/fluent-plugin-zabbix-simple"
@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "fluent-plugin-zabbix-simple"
   gem.require_paths = ["lib"]
-  gem.version       = "1.0.0"
+  gem.version       = "2.0.0"
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "rake"
