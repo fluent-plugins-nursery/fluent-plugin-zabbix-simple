@@ -15,6 +15,13 @@ fluent-plugin-zabbix-simple は、**fluentdのJSONキー** を **Zabbixキー** 
 
   * **key-replacement**(単に **replacement** と呼ぶ)は、_pattern_ と _fluentdのJSONキー_ との照合に成功した場合、Zabbix Server に送信されるキーです。
 
+## インストール要件
+
+| fluent-plugin-zabbix-simple | fluentd | ruby |
+|------------------------|---------|------|
+| >= 2.0.0 | >= v0.14.0 | >= 2.1 |
+|  <= 1.0.0 | >= v0.12.0 | >= 1.9 |
+
 ## インストール方法
 
 コマンド `gem install` を実行します。

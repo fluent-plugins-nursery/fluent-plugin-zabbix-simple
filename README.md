@@ -15,6 +15,13 @@ fluent-plugin-zabbix-simple converts **fluentd's JSON key** to **Zabbix key**, a
 
   * **key-replacement** (simple called **replacement**) is a key that is send to Zabbix Server if _pattern_ matches _fluentd's JSON key_. Before sending to Zabbix Server, _fluentd's JSON key_ is converted to _Zabbix key_ according to the replacement.
 
+## Requirements
+
+| fluent-plugin-zabbix-simple | fluentd | ruby |
+|------------------------|---------|------|
+| >= 2.0.0 | >= v0.14.0 | >= 2.1 |
+|  <= 1.0.0 | >= v0.12.0 | >= 1.9 |
+
 ## How to Install
 
 execute command `gem install`:
