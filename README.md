@@ -1,5 +1,7 @@
 # fluent-plugin-zabbix-simple, a plugin for [Fluentd](http://fluentd.org)
 
+[![Build Status](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple.svg?branch=master)](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple)
+
 ## What is this
 
 **fluent-plugin-zabbix-simple** is a [fluentd](http://fluentd.org/ "fluentd") output plugin to send values to [Zabbix](http://www.zabbix.com/ "Zabbix") Server.

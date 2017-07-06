@@ -1,5 +1,7 @@
 # fluent-plugin-zabbix-simple
 
+[![Build Status](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple.svg?branch=master)](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple)
+
 ## 概要
 
 **fluent-plugin-zabbix-simple** は、[fluentd](http://fluentd.org/ "fluentd") output plugin で、[Zabbix](http://www.zabbix.com/ "Zabbix") Server に値を送ることができます。
