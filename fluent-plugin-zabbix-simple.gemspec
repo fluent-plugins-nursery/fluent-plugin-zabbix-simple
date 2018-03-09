@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["nakano@ilu.co.jp", "cosmo0920.oucc@gmail.com", "okkez000@gmail.com"]
   gem.description   = %q{Output data plugin to Zabbix}
   gem.summary       = %q{Output data plugin to Zabbix (like zabbix_sender)}
-  gem.homepage      = "https://github.com/sunny4381/fluent-plugin-zabbix-simple"
+  gem.homepage      = "https://github.com/fluent-plugins-nursery/fluent-plugin-zabbix-simple"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
