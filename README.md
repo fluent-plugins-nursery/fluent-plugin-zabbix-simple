@@ -30,7 +30,7 @@ execute command `gem install`:
 
     $ sudo gem install fluent-plugin-zabbix-simple
 
-[td-agent](http://docs.fluentd.org/articles/install-by-rpm#what-is-td-agent) has its own Ruby ecosystem.
+[td-agent](https://docs.fluentd.org/installation/install-by-rpm#what-is-td-agent) has its own Ruby ecosystem.
 If you have installed td-agent, you would use `gem` command included with td-agent.
 
     $ sudo /usr/lib64/fluent/ruby/bin/gem isntall fluent-plugin-zabbix-simple
