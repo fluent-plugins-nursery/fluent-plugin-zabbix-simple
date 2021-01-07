@@ -1,6 +1,8 @@
 # fluent-plugin-zabbix-simple, a plugin for [Fluentd](http://fluentd.org)
 
-[![Build Status](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple.svg?branch=master)](https://travis-ci.org/fluent-plugins-nursery/fluent-plugin-zabbix-simple)
+![Testing on Ubuntu](https://github.com/fluent-plugins-nursery/fluent-plugin-zabbix-simple/workflows/Testing%20on%20Ubuntu/badge.svg)
+![Testing on macOS](https://github.com/fluent-plugins-nursery/fluent-plugin-zabbix-simple/workflows/Testing%20on%20macOS/badge.svg)
+![Testing on Windows](https://github.com/fluent-plugins-nursery/fluent-plugin-zabbix-simple/workflows/Testing%20on%20Windows/badge.svg)
 
 ## What is this
 
