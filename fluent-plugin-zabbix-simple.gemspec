@@ -21,4 +21,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "test-unit", "~> 3.3.9"
   gem.add_runtime_dependency "fluentd", [">= 0.14.15", "< 2"]
   gem.add_runtime_dependency "zabbix"
+  gem.add_runtime_dependency "yajl-ruby", "~> 1.0"
 end
